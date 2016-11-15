@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Home - FireBook</title>
+	<link rel="stylesheet" href="/css/materialize.min.css">
+	<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="container">
+	<h1>FireBook</h1>
+	<h2>New Post</h2>
+	<textarea class="materialize-textarea" id="new-post-textarea"></textarea>
+	<button class="btn" id="new-post-button">submit</button>
+	<h2>Your Feed</h2>
+	<div id="feed"></div>
+	<button class="btn" id="logout-button">Log Out</button>
+	<!-- Import jQuery -->
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+	<!-- Import Firebase -->
+	<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-database.js"></script>
+	<script src="/js/materialize.min.js"></script>
+	<script>
+	  // Initialize Firebase
+	  var config = {
+	    apiKey: "AIzaSyA2DIwHhvMV67zaP2jepR7HAK-M8B-bOEc",
+	    authDomain: "firebook-cb1fe.firebaseapp.com",
+	    databaseURL: "https://firebook-cb1fe.firebaseio.com",
+	    storageBucket: "firebook-cb1fe.appspot.com",
+	    messagingSenderId: "497627604310"
+	  };
+	  firebase.initializeApp(config);
+	</script>
+	<script>
+		firebase.auth().onAuthStateChanged(function(user) {
+		  if (user) {
+		  	// user is signed in
+		  } else {
+		  	window.location.replace('/login')
+		  }
+		});
+	</script>
+	<script>
+		var database = firebase.database();
+		var postListRef = database.ref('postList');
+		$(function() {
+			postListRef.on('child_added', function(data) {
+				$('#feed').prepend('<div id="post-'+data.key+'" data-key="'+data.key+'" class="post card"><strong class="post-author">'+data.val().author+':</strong><p class="post-content">'+data.val().body+'</p></div>');
+			})
+			$('#new-post-button').click(function() {
+				var $newPostTextarea = $('#new-post-textarea');
+				if($newPostTextarea.val() == '') {
+					return alert('Please write a post before submitting.');
+				}
+				postListRef.push().set({
+					author: firebase.auth().currentUser.email,
+					body: $newPostTextarea.val(),
+					createdAt: Date.now(),
+					stars: [],
+					comments: []
+				});
+				$newPostTextarea.val('');
+			});
+			$('#logout-button').click(function() {
+				firebase.auth().signOut().then(function() {
+					// Signed out
+				}, function(error) {
+				  alert(error.message);
+				});
+			});
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login - FireBook</title>
+	<link rel="stylesheet" href="/css/materialize.min.css">
+	<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="container">
+	<h1>FireBook</h1>
+	<h2>Log In / Sign Up</h2>
+	<div class="input-field">
+		<input type="email" id="email-input">
+		<label for="email-input">Email</label>
+	</div>
+	<div class="input-field">
+		<input type="password" id="password-input">
+		<label for="password-input">Password</label>
+	</div>
+	<button class="btn waves-effect" id="login-button">Log In</button>
+	<button class="btn waves-effect" id="signup-button">Sign Up</button>
+	<!-- Import jQuery -->
+	<script   src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+	<!-- Import Firebase -->
+	<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-auth.js"></script>
+	<script src="/js/materialize.min.js"></script>
+	<script>
+	  // Initialize Firebase
+	  var config = {
+	    apiKey: "AIzaSyA2DIwHhvMV67zaP2jepR7HAK-M8B-bOEc",
+	    authDomain: "firebook-cb1fe.firebaseapp.com",
+	    databaseURL: "https://firebook-cb1fe.firebaseio.com",
+	    storageBucket: "firebook-cb1fe.appspot.com",
+	    messagingSenderId: "497627604310"
+	  };
+	  firebase.initializeApp(config);
+	</script>
+	<script>
+		firebase.auth().onAuthStateChanged(function(user) {
+		  if (user) {
+		    window.location.replace('/')
+		  } else {
+		  	// user not signed in
+		  }
+		});
+	</script>
+	<script>
+		$(function() {
+			// handle signup
+			$('#signup-button').click(function(evt) {
+				if($('#email-input').val() == '' || $('#password-input').val() == '') {
+					return alert('Please enter email and password.');
+				}
+				firebase.auth()
+					.createUserWithEmailAndPassword($('#email-input').val(), $('#password-input').val())
+					.catch(function(error) {
+				  // Handle Errors here.
+				  var errorCode = error.code;
+				  var errorMessage = error.message;
+				  alert(errorMessage);
+				  // ...
+				});
+			});
+
+			// handle login
+			$('#login-button').click(function(evt) {
+				if($('#email-input').val() == '' || $('#password-input').val() == '') {
+					return alert('Please enter email and password.');
+				}
+				firebase.auth().signInWithEmailAndPassword($('#email-input').val(), $('#password-input').val())
+					.catch(function(error) {
+				  // Handle Errors here.
+				  var errorCode = error.code;
+				  var errorMessage = error.message;
+				  alert(errorMessage);
+				  // ...
+				});
+			});
+		});
+	</script>
+</body>
+</html>
